@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Image Background Remover - Phase 1 MVP</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --accent: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+    .container {
+      width: 100%;
+      max-width: 960px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #047857;
+      color: #a7f3d0;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+    }
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .dropzone {
+      border: 2px dashed #475569;
+      border-radius: 10px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: rgba(15, 23, 42, 0.5);
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--primary);
+      background: rgba(37, 99, 235, 0.08);
+    }
+    .dropzone p {
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--primary-hover);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-download {
+      background: var(--accent);
+    }
+    .btn-download:hover:not(:disabled) {
+      background: #059669;
+    }
+    .btn-secondary {
+      background: #334155;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: #475569;
+    }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    @media (max-width: 640px) {
+      .preview-grid { grid-template-columns: 1fr; }
+    }
+    .preview-box {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .preview-box h3 {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .img-wrap {
+      width: 100%;
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+    .img-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .checkerboard {
+      background-color: #e2e8f0;
+      background-image: 
+        linear-gradient(45deg, #cbd5e1 25%, transparent 25%), 
+        linear-gradient(-45deg, #cbd5e1 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #cbd5e1 75%), 
+        linear-gradient(-45deg, transparent 75%, #cbd5e1 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-msg {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge">100% Free - Open-Source U²-Net Model</div>
+      <h1>AI Product Image Background Remover</h1>
+      <p class="subtitle">Windows 7 Compatible Python FastAPI MVP. No API keys, no paid subscriptions.</p>
+    </header>
+
+    <div class="card">
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+        <svg width="48" height="48" fill="none" stroke="#64748b" stroke-width="1.5" viewBox="0 0 24 24" style="margin: 0 auto; display: block;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"/>
+        </svg>
+        <p><strong>Click to browse</strong> or drag and drop a product image here</p>
+        <p style="font-size: 12px; color: #64748b;">Supports JPG, JPEG, PNG, WebP (up to 15MB)</p>
+      </div>
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display: none;" />
+
+      <div style="display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap;">
+        <button class="btn" id="removeBtn" disabled onclick="removeBackground()">
+          <span>Remove Background</span>
+        </button>
+        <button class="btn btn-secondary" id="resetBtn" style="display: none;" onclick="resetAll()">
+          Select Another Image
+        </button>
+      </div>
+
+      <div id="statusArea" style="display: none;" class="status-msg">
+        <div class="spinner"></div>
+        <span id="statusText">Processing background removal via local U²-Net...</span>
+      </div>
+    </div>
+
+    <!-- Preview Area -->
+    <div class="card" id="resultCard" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+        <h2 style="font-size: 18px; font-weight: 600;">Before & After Results</h2>
+        <button class="btn btn-download" id="downloadBtn" onclick="downloadImage()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+          </svg>
+          Download Transparent PNG
+        </button>
+      </div>
+
+      <div class="preview-grid">
+        <div class="preview-box">
+          <h3>Original Image</h3>
+          <div class="img-wrap">
+            <img id="origImg" alt="Original product" />
+          </div>
+        </div>
+
+        <div class="preview-box">
+          <h3>Transparent Result (Checkerboard)</h3>
+          <div class="img-wrap checkerboard">
+            <img id="resultImg" alt="Background removed transparent PNG" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentFile = null;
+    let resultBlobUrl = null;
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const removeBtn = document.getElementById('removeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusArea = document.getElementById('statusArea');
+    const statusText = document.getElementById('statusText');
+    const resultCard = document.getElementById('resultCard');
+    const origImg = document.getElementById('origImg');
+    const resultImg = document.getElementById('resultImg');
+
+    ['dragenter', 'dragover'].forEach(name => {
+      dropzone.addEventListener(name, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+      dropzone.addEventListener(name, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); });
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleSelectedFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        handleSelectedFile(e.target.files[0]);
+      }
+    });
+
+    function handleSelectedFile(file) {
+      if (!file.type.match(/^image\/(jpeg|png|webp)/) && !file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
+        alert('Please choose a valid JPG, PNG, or WebP image.');
+        return;
+      }
+      currentFile = file;
+      origImg.src = URL.createObjectURL(file);
+      removeBtn.disabled = false;
+      resetBtn.style.display = 'inline-flex';
+      resultCard.style.display = 'none';
+      if (resultBlobUrl) { URL.revokeObjectURL(resultBlobUrl); resultBlobUrl = null; }
+    }
+
+    async function removeBackground() {
+      if (!currentFile) return;
+      removeBtn.disabled = true;
+      statusArea.style.display = 'flex';
+      statusText.textContent = 'Removing background with U²-Net AI model...';
+
+      const formData = new FormData();
+      formData.append('file', currentFile);
+
+      try {
+        const res = await fetch('/api/remove-background', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({ detail: res.statusText }));
+          throw new Error(errData.detail || 'Processing failed');
+        }
+
+        const blob = await res.blob();
+        resultBlobUrl = URL.createObjectURL(blob);
+        resultImg.src = resultBlobUrl;
+        resultCard.style.display = 'block';
+        resultCard.scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        alert('Error removing background: ' + err.message);
+      } finally {
+        removeBtn.disabled = false;
+        statusArea.style.display = 'none';
+      }
+    }
+
+    function downloadImage() {
+      if (!resultBlobUrl) return;
+      const a = document.createElement('a');
+      a.href = resultBlobUrl;
+      const baseName = currentFile ? currentFile.name.replace(/\.[^/.]+$/, '') : 'product';
+      a.download = `${baseName}_transparent.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function resetAll() {
+      currentFile = null;
+      fileInput.value = '';
+      removeBtn.disabled = true;
+      resetBtn.style.display = 'none';
+      resultCard.style.display = 'none';
+      if (resultBlobUrl) { URL.revokeObjectURL(resultBlobUrl); resultBlobUrl = null; }
+    }
+  </script>
+</body>
+</html>

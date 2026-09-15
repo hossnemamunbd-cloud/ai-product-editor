@@ -1,0 +1,6 @@
+{
+  "name": "AI Background Remover",
+  "description": "Free Phase 1 MVP of an AI Product Image Background Remover with open-source pretrained model, transparent PNG export, and Windows 7 Python FastAPI guide.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
