@@ -1,6 +1,6 @@
 {
-  "name": "AI Background Remover",
-  "description": "Free Phase 1 MVP of an AI Product Image Background Remover with open-source pretrained model, transparent PNG export, and Windows 7 Python FastAPI guide.",
+  "name": "AI Product Image Editor",
+  "description": "Professional AI Product Image Editor to remove backgrounds, generate photorealistic AI backgrounds, apply custom 2- and 3-color studio gradients, cast realistic shadows, and download high-quality product images.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -3,6 +3,7 @@ export interface SampleProduct {
   name: string;
   category: string;
   url: string;
+  transparentUrl: string;
 }
 
 export const SAMPLE_PRODUCTS: SampleProduct[] = [
@@ -10,18 +11,21 @@ export const SAMPLE_PRODUCTS: SampleProduct[] = [
     id: 'sneaker',
     name: 'Retro Running Sneaker',
     category: 'Footwear',
-    url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80'
+    url: '/samples/sneaker.jpg',
+    transparentUrl: '/samples/sneaker_transparent.png'
   },
   {
     id: 'watch',
     name: 'Minimalist Chronograph',
     category: 'Accessories',
-    url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80'
+    url: '/samples/watch.jpg',
+    transparentUrl: '/samples/watch_transparent.png'
   },
   {
     id: 'headphones',
     name: 'Wireless Studio Headphones',
     category: 'Electronics',
-    url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80'
+    url: '/samples/headphones.jpg',
+    transparentUrl: '/samples/headphones_transparent.png'
   }
 ];

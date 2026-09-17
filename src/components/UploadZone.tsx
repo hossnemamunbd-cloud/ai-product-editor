@@ -6,6 +6,7 @@ interface UploadZoneProps {
   selectedFile: File | null;
   imagePreviewUrl: string | null;
   onFileSelect: (file: File) => void;
+  onSelectSample: (sample: SampleProduct) => void;
   onRemoveBackground: () => void;
   isProcessing: boolean;
   onReset: () => void;
@@ -15,12 +16,13 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
   selectedFile,
   imagePreviewUrl,
   onFileSelect,
+  onSelectSample,
   onRemoveBackground,
   isProcessing,
   onReset,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [loadingSample, setLoadingSample] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -48,41 +50,39 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
   };
 
   const validateAndUpload = (file: File) => {
+    setUploadError(null);
     const validExtensions = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
     const hasValidExt = /\.(jpe?g|png|webp)$/i.test(file.name);
 
     if (!validExtensions.includes(file.type) && !hasValidExt) {
-      alert('Unsupported file format. Please upload a JPG, JPEG, PNG, or WebP image.');
+      setUploadError('Unsupported format. Please upload a JPG, JPEG, PNG, or WebP image.');
       return;
     }
 
     if (file.size > 25 * 1024 * 1024) {
-      alert('File size exceeds 25MB limit. Please choose a smaller image.');
+      setUploadError('File size exceeds 25MB limit. Please choose a smaller image.');
       return;
     }
 
     onFileSelect(file);
   };
 
-  const handleSelectSample = async (sample: SampleProduct) => {
-    try {
-      setLoadingSample(sample.id);
-      const res = await fetch(sample.url);
-      const blob = await res.blob();
-      const file = new File([blob], `${sample.id}.jpg`, { type: 'image/jpeg' });
-      onFileSelect(file);
-    } catch (err) {
-      console.error('Failed to load sample image', err);
-      alert('Could not load sample image. Please upload a local image file.');
-    } finally {
-      setLoadingSample(null);
-    }
+  const handleSelectSample = (sample: SampleProduct) => {
+    setUploadError(null);
+    onSelectSample(sample);
   };
 
   return (
     <div className="w-full">
       {!imagePreviewUrl ? (
         <div className="space-y-4">
+          {uploadError && (
+            <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+              <span>{uploadError}</span>
+            </div>
+          )}
+
           <div
             id="drag-drop-zone"
             onDragOver={handleDragOver}
@@ -156,26 +156,24 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
                   key={sample.id}
                   type="button"
                   onClick={() => handleSelectSample(sample)}
-                  disabled={loadingSample !== null}
-                  className="flex items-center gap-3 p-2 rounded-lg bg-slate-800 hover:bg-slate-700/80 border border-slate-700/70 hover:border-slate-600 transition text-left group cursor-pointer"
+                  disabled={isProcessing}
+                  className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 hover:border-slate-500 shadow-sm hover:shadow transition-all text-left group cursor-pointer active:scale-[0.98]"
                 >
                   <img
                     src={sample.url}
                     alt={sample.name}
-                    className="w-12 h-12 rounded-md object-cover border border-slate-700"
-                    crossOrigin="anonymous"
+                    className="w-12 h-12 rounded-lg object-cover border border-slate-600/50 bg-slate-900 shrink-0"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-medium text-slate-200 group-hover:text-white truncate">
+                    <p className="text-xs font-semibold text-slate-100 group-hover:text-blue-300 truncate transition-colors">
                       {sample.name}
                     </p>
-                    <p className="text-[11px] text-slate-400">{sample.category}</p>
+                    <p className="text-[11px] text-slate-400 flex items-center justify-between">
+                      <span>{sample.category}</span>
+                      <span className="text-[10px] text-blue-400/80 group-hover:text-blue-300 font-medium">Try now</span>
+                    </p>
                   </div>
-                  {loadingSample === sample.id ? (
-                    <span className="text-xs text-blue-400 animate-pulse">Loading...</span>
-                  ) : (
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 mr-1" />
-                  )}
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0" />
                 </button>
               ))}
             </div>
@@ -219,7 +217,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-xs text-slate-400 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-              Open-source U²-Net Model loaded and ready
+              Ready to remove background
             </div>
 
             <button

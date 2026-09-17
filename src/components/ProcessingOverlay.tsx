@@ -24,7 +24,7 @@ export const ProcessingOverlay: React.FC<ProcessingOverlayProps> = ({ stepText, 
           Isolating Product Subject...
         </h3>
         <p className="text-xs text-slate-400 font-medium">
-          {stepText || 'Executing open-source pretrained model...'}
+          {stepText || 'Processing image...'}
         </p>
       </div>
 
@@ -37,7 +37,7 @@ export const ProcessingOverlay: React.FC<ProcessingOverlayProps> = ({ stepText, 
           />
         </div>
         <div className="flex justify-between text-[11px] text-slate-500 font-mono">
-          <span>U²-Net AI Model</span>
+          <span>Removing background</span>
           <span>{percent}%</span>
         </div>
       </div>
